@@ -98,10 +98,11 @@ class Spider(object):
     # B站排行榜
     def spider_bsite(self):
         list_bsite = []
+        ex = 'https:'
         soup = Spider(bsite_api).soup
         for i in soup.xpath("//div[@class='info']/a"):
             bsite_title = i.xpath('text()')[0]
-            bsite_url = i.get('href')
+            bsite_url = ex + i.get('href')
             list_bsite.append([bsite_title, bsite_url])
         return packdata(list_bsite)
 
