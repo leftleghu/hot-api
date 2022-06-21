@@ -20,21 +20,21 @@ def run_tieba():
     global data_tieba
     data_tieba = s.spider_tieba()
 
+def run_baidu():
+    global data_baidu
+    data_baidu = s.spider_baidu()
 
 def run_zhihu():
     global data_zhihu
     data_zhihu = s.spider_zhihu()
 
-
 def run_vsite():
     global data_vsite
     data_vsite = s.spider_vsite()
 
-
 def run_weibo():
     global data_weibo
     data_weibo = s.spider_weibo()
-
 
 def run_bsite():
     global data_bsite
@@ -46,6 +46,7 @@ def task1():
     # 多线程运行
     Thread(target=run_zhihu, ).start()
     Thread(target=run_tieba, ).start()
+    Thread(target=run_baidu, ).start()
     Thread(target=run_weibo, ).start()
     Thread(target=run_vsite, ).start()
     Timer(15 * 60, task1, ).start()
@@ -79,6 +80,8 @@ def read_name(name: str):
         return data_weibo
     elif name == 'tieba':
         return data_tieba
+    elif name == 'baidu':
+        return data_baidu
     elif name == 'bsite':
         return data_bsite
 
