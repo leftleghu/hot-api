@@ -11,6 +11,10 @@ weibo_api = "https://s.weibo.com/top/summary?cate=realtimehot"
 tieba_api = "http://tieba.baidu.com/hottopic/browse/topicList?res_type=1"
 zhihu_api = 'https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true'
 baidu_api = 'https://top.baidu.com/board?tab=realtime'
+shijiulou_api = 'https://www.19lou.com/r/1/rd.html'
+cqmmgo_api = 'https://go.cqmmgo.com/r/82/syttsl.html'
+
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"}
 headers_weibo = {
@@ -21,6 +25,10 @@ headers_weibo = {
 headers_bsite = {
     'host': 'www.bilibili.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
+}
+headers_shijiulou = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+    'cookie': '_DM_SID_=9322454c193c65daf5cdc3a8ac527dd6; _9755xjdesxxd_=32; __snaker__id=dCoLZRoVn7FF19zA; _Z3nY0d4C_=37XgPK9h'
 }
 
 
@@ -44,9 +52,15 @@ class Spider(object):
                 self.res = requests.get(url, headers=headers_weibo)
             elif url == bsite_api:
                 self.res = requests.get(url, headers=headers_bsite)
+            elif url == shijiulou_api:
+                self.res = requests.get(url, headers=headers_shijiulou)
+                self.res.encoding = "gbk"
+            elif url == cqmmgo_api:
+                self.res = requests.get(url, headers=headers_shijiulou)
+                self.res.encoding = "gbk"
             else:
                 self.res = requests.get(url, headers=headers)
-            self.res.encoding = "utf-8"
+                self.res.encoding = "utf-8"
             self.soup = etree.HTML(self.res.text)
 
     # 知乎热榜
@@ -104,9 +118,11 @@ class Spider(object):
         # for soup_title in soup.xpath("//*[@class='c-single-text-ellipsis']/text()"):
         #     baidu_title = soup_title
         for i in range(1, 31):
-            baidu_title = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/div[1]/text()")
+            baidu_title = soup.xpath(
+                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/div[1]/text()")
             baidu_url = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/@href")
-            baidu_zhishu = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")
+            baidu_zhishu = soup.xpath(
+                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")
             # print(baidu_title, baidu_url, baidu_zhishu)
             list_baidu.append([baidu_title, baidu_url, baidu_zhishu])
         return packdata(list_baidu)
@@ -136,13 +152,48 @@ class Spider(object):
         list_bsite = []
         ex = 'https:'
         soup = Spider(bsite_api).soup
-        for i in soup.xpath("//div[@class='info']/a"):
-            bsite_title = i.xpath('text()')[0]
-            bsite_url = ex + i.get('href')
-            bsite_zhishu = i.xpath('normalize-space(//span[@class="data-box"]/text())')
+        # for i in soup.xpath("//div[@class='info']/a"):
+        #     bsite_title = i.xpath('text()')[0]
+        #     bsite_url = ex + i.get('href')
+        #     bsite_zhishu = i.xpath('normalize-space(//span[@class="data-box"]/text())')
             # print(bsite_zhishu)
+        for i in soup.xpath("//div[@class='info']"):
+            bsite_title = i.xpath("./a/text()")[0]
+            bsite_url = ex + i.xpath("./a/@href")[0]
+            bsite_play = i.xpath('normalize-space(.//div[@class="detail-state"]/span[1]/text())')
+            bsite_like = i.xpath('normalize-space(.//div[@class="detail-state"]/span[2]/text())')
+            bsite_zhishu = bsite_play + "/" + bsite_like
             list_bsite.append([bsite_title, bsite_url, bsite_zhishu])
         return packdata(list_bsite)
 
+    # 19lou排行榜
+    def spider_shijiulou(self):
+        list_shijiulou = []
+        ex = 'https:'
+        soup = Spider(shijiulou_api).soup
+        for i in soup.xpath("//div[starts-with(@id,'J_item_')]"):
+            shijiulou_title = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@title)')
+            shijiulou_url = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@href)')
+            shijiulou_read = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[1]/em/text())')
+            shijiulou_reply = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[2]/em/text())')
+            shijiulou_zhishu = shijiulou_read + "/" + shijiulou_reply
+            # print(shijiulou_zhishu)
+            list_shijiulou.append([shijiulou_title, shijiulou_url, shijiulou_zhishu])
+        return packdata(list_shijiulou)
 
-Spider().spider_bsite()
+    # 重庆购物狂排行榜
+    def spider_cqmmgo(self):
+        list_cqmmgo = []
+        ex = 'https:'
+        soup = Spider(cqmmgo_api).soup
+        for i in soup.xpath("//div[starts-with(@id,'J_item_')]"):
+            cqmmgo_title = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@title)')
+            cqmmgo_url = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@href)')
+            cqmmgo_read = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[1]/em/text())')
+            cqmmgo_reply = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[2]/em/text())')
+            cqmmgo_zhishu = cqmmgo_read + "/" + cqmmgo_reply
+            # print(shijiulou_zhishu)
+            list_cqmmgo.append([cqmmgo_title, cqmmgo_url, cqmmgo_zhishu])
+        return packdata(list_cqmmgo)
+
+# Spider().spider_bsite()
