@@ -119,10 +119,10 @@ class Spider(object):
         #     baidu_title = soup_title
         for i in range(1, 31):
             baidu_title = soup.xpath(
-                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/div[1]/text()")
-            baidu_url = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/@href")
+                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/div[1]/text()")[0]
+            baidu_url = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/@href")[0]
             baidu_zhishu = soup.xpath(
-                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")
+                "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")[0]
             # print(baidu_title, baidu_url, baidu_zhishu)
             list_baidu.append([baidu_title, baidu_url, baidu_zhishu])
         return packdata(list_baidu)
