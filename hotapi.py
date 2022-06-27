@@ -7,6 +7,7 @@ from threading import Timer
 from threading import Thread
 
 data_zhihu = []  # 知乎
+data_toutiao = []  # 头条
 data_tieba = []  # 贴吧
 data_baidu = []  # 百度
 data_vsite = []  # V2EX
@@ -31,6 +32,11 @@ def run_baidu():
 def run_zhihu():
     global data_zhihu
     data_zhihu = s.spider_zhihu()
+
+
+def run_toutiao():
+    global data_toutiao
+    data_toutiao = s.spider_toutiao()
 
 
 def run_vsite():
@@ -60,6 +66,7 @@ def run_cqmmgo():
 def task1():
     # 多线程运行
     Thread(target=run_zhihu, ).start()
+    Thread(target=run_toutiao, ).start()
     Thread(target=run_tieba, ).start()
     Thread(target=run_baidu, ).start()
     Thread(target=run_weibo, ).start()
@@ -91,6 +98,8 @@ def index():
 def read_name(name: str):
     if name == 'zhihu':
         return data_zhihu
+    elif name == 'toutiao':
+        return data_toutiao
     elif name == 'vsite':
         return data_vsite
     elif name == 'weibo':

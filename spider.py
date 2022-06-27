@@ -13,6 +13,7 @@ zhihu_api = 'https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50
 baidu_api = 'https://top.baidu.com/board?tab=realtime'
 shijiulou_api = 'https://www.19lou.com/r/1/rd.html'
 cqmmgo_api = 'https://go.cqmmgo.com/r/82/syttsl.html'
+toutiao_api = 'https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc'
 
 
 headers = {
@@ -73,8 +74,25 @@ class Spider(object):
         for part_zhihu_data in zhihu_data:  # 遍历每一个data对象
             zhihu_id = part_zhihu_data['target']['id']  # 从对象得到问题的id
             zhihu_title = part_zhihu_data['target']['title']  # 从对象得到问题的title
-            list_zhihu.append([zhihu_title, zhihu_id, 0])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
+            zhihu_answer = part_zhihu_data['target']['answer_count']
+            zhihu_follower = part_zhihu_data['target']['follower_count']
+            zhihu_zhishu = str(zhihu_follower) + "/" + str(zhihu_answer)
+            list_zhihu.append([zhihu_title, zhihu_id, zhihu_zhishu])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
         return packdata(list_zhihu)
+
+    # 头条热榜
+    def spider_toutiao(self):
+
+        list_toutiao = []  # 此列表用于储存解析结果
+        res = Spider(toutiao_api).res
+        # 逐步解析接口返回的json
+        toutiao_data = json.loads(res.text)['data']
+        for part_toutiao_data in toutiao_data:  # 遍历每一个data对象
+            toutiao_url = part_toutiao_data['Url']  # 从对象得到问题的id
+            toutiao_title = part_toutiao_data['Title']  # 从对象得到问题的title
+            toutiao_zhishu = part_toutiao_data['HotValue']
+            list_toutiao.append([toutiao_title, toutiao_url, toutiao_zhishu])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
+        return packdata(list_toutiao)
 
     # 微博热搜
     def spider_weibo(self):
