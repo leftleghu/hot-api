@@ -154,7 +154,7 @@ class Spider(object):
             baidu_url = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/@href")[0]
             baidu_zhishu_ori = soup.xpath(
                 "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")[0]
-            baidu_zhishu = str(int(int(baidu_zhishu_ori)/10000)) + "万"
+            baidu_zhishu = str(round(int(baidu_zhishu_ori)/10000, 1)) + "万"
             # print(baidu_title, baidu_url, baidu_zhishu)
             list_baidu.append([baidu_title, baidu_url, baidu_zhishu])
         return packdata(list_baidu)
