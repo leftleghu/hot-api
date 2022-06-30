@@ -15,6 +15,12 @@ data_bsite = []  # B站
 data_weibo = []  # 微博
 data_shijiulou = []  # 19楼
 data_cqmmgo = []  # cqmmgo
+data_tianya = []  # 天涯
+data_douyin = []  # 抖音
+data_kuaishou = []  # 快手
+data_a36kr = []  # 36kr
+data_huxiu = []  # huxiu
+
 
 s = Spider()
 
@@ -39,9 +45,9 @@ def run_toutiao():
     data_toutiao = s.spider_toutiao()
 
 
-def run_vsite():
-    global data_vsite
-    data_vsite = s.spider_vsite()
+# def run_vsite():
+#     global data_vsite
+#     data_vsite = s.spider_vsite()
 
 
 def run_weibo():
@@ -58,9 +64,36 @@ def run_shijiulou():
     global data_shijiulou
     data_shijiulou = s.spider_shijiulou()
 
+
 def run_cqmmgo():
     global data_cqmmgo
     data_cqmmgo = s.spider_cqmmgo()
+
+
+def run_tianya():
+    global data_tianya
+    data_tianya = s.spider_tianya()
+
+
+def run_douyin():
+    global data_douyin
+    data_douyin = s.spider_douyin()
+
+
+def run_kuaishou():
+    global data_kuaishou
+    data_kuaishou = s.spider_kuaishou()
+
+
+def run_a36kr():
+    global data_a36kr
+    data_a36kr = s.spider_a36kr()
+
+
+def run_huxiu():
+    global data_huxiu
+    data_huxiu = s.spider_huxiu()
+
 
 # 此组15分钟采集一次
 def task1():
@@ -70,9 +103,14 @@ def task1():
     Thread(target=run_tieba, ).start()
     Thread(target=run_baidu, ).start()
     Thread(target=run_weibo, ).start()
-    Thread(target=run_vsite, ).start()
+    # Thread(target=run_vsite, ).start()
     Thread(target=run_shijiulou, ).start()
     Thread(target=run_cqmmgo, ).start()
+    Thread(target=run_tianya, ).start()
+    Thread(target=run_douyin, ).start()
+    Thread(target=run_kuaishou, ).start()
+    Thread(target=run_a36kr, ).start()
+    Thread(target=run_huxiu, ).start()
     Timer(15 * 60, task1, ).start()
 
 
@@ -114,6 +152,16 @@ def read_name(name: str):
         return data_shijiulou
     elif name == 'cqmmgo':
         return data_cqmmgo
+    elif name == 'tianya':
+        return data_tianya
+    elif name == 'douyin':
+        return data_douyin
+    elif name == 'kuaishou':
+        return data_kuaishou
+    elif name == '36kr':
+        return data_a36kr
+    elif name == 'huxiu':
+        return data_huxiu
 
 
 if __name__ == '__main__':

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import json
+import re
 import requests
+import datetime
 from lxml import etree
 from threading import Timer
 
-vsite_api = "https://www.v2ex.com/?tab=hot"
+# vsite_api = "https://www.v2ex.com/?tab=hot"
 bsite_api = 'https://www.bilibili.com/v/popular/rank/all'
 weibo_api = "https://s.weibo.com/top/summary?cate=realtimehot"
 tieba_api = "http://tieba.baidu.com/hottopic/browse/topicList?res_type=1"
@@ -14,6 +16,10 @@ baidu_api = 'https://top.baidu.com/board?tab=realtime'
 shijiulou_api = 'https://www.19lou.com/r/1/rd.html'
 cqmmgo_api = 'https://go.cqmmgo.com/r/82/syttsl.html'
 toutiao_api = 'https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc'
+tianya_api = 'https://bbs.tianya.cn/api?method=bbs.ice.getHotArticleList&params.pageSize=40&params.pageNum=1'
+douyin_api = 'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/'
+kuaishou_api = 'https://www.kuaishou.com/brilliant'
+huxiu_api = 'https://www.huxiu.com/'
 
 
 headers = {
@@ -90,7 +96,9 @@ class Spider(object):
         for part_toutiao_data in toutiao_data:  # 遍历每一个data对象
             toutiao_url = part_toutiao_data['Url']  # 从对象得到问题的id
             toutiao_title = part_toutiao_data['Title']  # 从对象得到问题的title
-            toutiao_zhishu = part_toutiao_data['HotValue']
+            toutiao_zhishu_ori = part_toutiao_data['HotValue']
+            toutiao_zhishu = str(round(int(toutiao_zhishu_ori)/10000, 1)) + "万"
+
             list_toutiao.append([toutiao_title, toutiao_url, toutiao_zhishu])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
         return packdata(list_toutiao)
 
@@ -102,10 +110,14 @@ class Spider(object):
         # for soup_a in soup.xpath("//td[@class='td-02']/a"):
         #     wb_title = soup_a.text
         #     wb_url = weibo + soup_a.get('href')
-        for soup_a in soup.xpath("//td[@class='td-02']"):
+        for soup_a in soup.xpath("//td[@class='td-02']")[1:]:
             wb_title = soup_a.xpath(".//a/text()")[0]
             wb_url = weibo + soup_a.xpath(".//a/@href")[0]
-            wb_zhishu = soup_a.xpath('normalize-space(.//span/text())')
+            wb_zhishu_ori = soup_a.xpath('normalize-space(.//span/text())')
+            if wb_zhishu_ori.isdigit():
+                wb_zhishu = str(round(int(wb_zhishu_ori)/10000, 1)) + "万"
+            else:
+                wb_zhishu = wb_zhishu_ori
             # 过滤微博的广告，做个判断
             if "javascript:void(0)" in wb_url:
                 pass
@@ -123,7 +135,8 @@ class Spider(object):
         for soup_a in soup.xpath("//div[@class='topic-name']"):
             tieba_title = soup_a.xpath(".//a[@class='topic-text']/text()")[0]
             tieba_url = soup_a.xpath(".//a[@class='topic-text']/@href")[0]
-            tieba_zhishu = soup_a.xpath(".//span[@class='topic-num']/text()")[0]
+            tieba_zhishu_ori = soup_a.xpath(".//span[@class='topic-num']/text()")[0]
+            tieba_zhishu = tieba_zhishu_ori.replace('实时讨论', '')
             list_tieba.append([tieba_title, tieba_url, tieba_zhishu])
         return packdata(list_tieba)
 
@@ -139,17 +152,18 @@ class Spider(object):
             baidu_title = soup.xpath(
                 "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/div[1]/text()")[0]
             baidu_url = soup.xpath("//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[2]/a/@href")[0]
-            baidu_zhishu = soup.xpath(
+            baidu_zhishu_ori = soup.xpath(
                 "//*[@id='sanRoot']/main/div[2]/div/div[2]/div[" + str(i) + "]/div[1]/div[2]/text()")[0]
+            baidu_zhishu = str(int(int(baidu_zhishu_ori)/10000)) + "万"
             # print(baidu_title, baidu_url, baidu_zhishu)
             list_baidu.append([baidu_title, baidu_url, baidu_zhishu])
         return packdata(list_baidu)
 
     # V2EX热度榜单
-    def spider_vsite(self):
-        list_v2ex = []
-        vsite = "https://www.v2ex.com"
-        soup = Spider(vsite_api).soup
+    # def spider_vsite(self):
+    #     list_v2ex = []
+    #     vsite = "https://www.v2ex.com"
+    #     soup = Spider(vsite_api).soup
         # for soup_a in soup.xpath("//span[@class='item_title']/a"):
         #     vsite_title = soup_a.text
         #     vsite_url = vsite + soup_a.get('href')
@@ -157,13 +171,13 @@ class Spider(object):
         # vsite_title = vsite_b.text
         # vsite_url = vsite + vsite_b.get('href')
 
-        for soup_a in soup.xpath("//div[@class='cell item']"):
-            vsite_title = soup_a.xpath(".//span[@class='item_title']/a/text()")[0]
-            vsite_url = vsite + soup_a.xpath(".//span[@class='item_title']/a/@href")[0]
-            vsite_zhishu = soup_a.xpath(".//a[@class='count_livid']/text()")[0]
-            # print(vsite_zhishu)
-            list_v2ex.append([vsite_title, vsite_url, vsite_zhishu])
-        return packdata(list_v2ex)
+        # for soup_a in soup.xpath("//div[@class='cell item']"):
+        #     vsite_title = soup_a.xpath(".//span[@class='item_title']/a/text()")[0]
+        #     vsite_url = vsite + soup_a.xpath(".//span[@class='item_title']/a/@href")[0]
+        #     vsite_zhishu = soup_a.xpath(".//a[@class='count_livid']/text()")[0]
+        #     # print(vsite_zhishu)
+        #     list_v2ex.append([vsite_title, vsite_url, vsite_zhishu])
+        # return packdata(list_v2ex)
 
     # B站排行榜
     def spider_bsite(self):
@@ -213,5 +227,95 @@ class Spider(object):
             # print(shijiulou_zhishu)
             list_cqmmgo.append([cqmmgo_title, cqmmgo_url, cqmmgo_zhishu])
         return packdata(list_cqmmgo)
+
+    # 天涯热搜
+    def spider_tianya(self):
+        list_tianya = []  # 此列表用于储存解析结果
+        res = Spider(tianya_api).res
+        # 逐步解析接口返回的json
+        tianya_data = json.loads(res.text)['data']['rows']
+        # print(tianya_data)
+        for part_tianya_data in tianya_data:  # 遍历每一个data对象
+            tianya_title = part_tianya_data['title']  # 从对象得到问题的title
+            tianya_url = part_tianya_data['url']  # 从对象得到问题的url
+            tianya_zhishu = part_tianya_data['count']  # 从对象得到问题的回复数
+            list_tianya.append([tianya_title, tianya_url, tianya_zhishu])  # 将title和url组为一个列表，并添加在list_tianya列表中
+        return packdata(list_tianya)
+
+    # 抖音热榜
+    def spider_douyin(self):
+        list_douyin = []  # 此列表用于储存解析结果
+        ex = 'https://www.douyin.com/search/'
+        res = Spider(douyin_api).res
+        # 逐步解析接口返回的json
+        douyin_data = json.loads(res.text)['word_list']
+        for part_douyin_data in douyin_data:  # 遍历每一个data对象
+            # print(part_douyin_data)
+            douyin_title = part_douyin_data['word']  # 从对象得到问题的title
+            douyin_url = ex + part_douyin_data['word']  # 从对象得到问题的url
+            douyin_zhishu_ori = part_douyin_data['hot_value']  # 从对象得到问题的回复数
+            douyin_zhishu = str(round(douyin_zhishu_ori/10000, 1)) + "万"
+            list_douyin.append([douyin_title, douyin_url, douyin_zhishu])  # 将title和url组为一个列表，并添加在list_tianya列表中
+        return packdata(list_douyin)
+
+    def spider_kuaishou(self):
+        list_kuaishou = []  # 此列表用于储存解析结果
+        ex = 'https://www.kuaishou.com/search/video?searchKey='
+        soup = Spider(kuaishou_api).soup
+        soup_a = soup.xpath('//script/text()')[0]
+        soup_b = re.search(r"window\.__APOLLO_STATE__=(.*?);", soup_a).group(1)
+        kuaishou_data = json.loads(soup_b, strict=False)
+        kuaishou_ids = kuaishou_data['defaultClient']['$ROOT_QUERY.visionHotRank({\"page\":\"brilliant\"})']['items']
+
+        for kuaishou_id in kuaishou_ids:
+            kuaishou_key = kuaishou_id['id']
+            kuaishou_title = kuaishou_data['defaultClient'][kuaishou_key]['name']
+            kuaishou_url = ex + kuaishou_title
+            kuaishou_zhishu = kuaishou_data['defaultClient'][kuaishou_key]['hotValue']
+            list_kuaishou.append([kuaishou_title, kuaishou_url, kuaishou_zhishu])
+        return packdata(list_kuaishou)
+
+    def spider_a36kr(self):
+        today = datetime.date.today()
+        a36kr_api = 'https://36kr.com/hot-list/zonghe/{}/1'.format(today)
+        list_a36kr = []  # 此列表用于储存解析结果
+        ex = 'https://36kr.com/p/'
+        soup = Spider(a36kr_api).soup
+        soup_a = soup.xpath('//body/script/text()')[0]
+        soup_aa = soup_a + "leftleg"
+        soup_b = re.search(r"window\.initialState=(.*?)leftleg", soup_aa).group(1)
+        a36kr_data = json.loads(soup_b, strict=False)
+        a36kr_ids = a36kr_data['hotListDetail']['articleList']['itemList']
+
+        for a36kr_id in a36kr_ids:
+            a36kr_key = a36kr_id['itemId']
+            a36kr_title = a36kr_id['widgetTitle']
+            a36kr_zhishu = a36kr_id['statCollect']
+            # print(a36kr_zhishu)
+            a36kr_url = ex + str(a36kr_key)
+
+            list_a36kr.append([a36kr_title, a36kr_url, a36kr_zhishu])
+        return packdata(list_a36kr)
+
+    def spider_huxiu(self):
+        list_huxiu = []  # 此列表用于储存解析结果
+        ex = 'https://36kr.com/p/'
+        soup = Spider(huxiu_api).soup
+        soup_a = soup.xpath('//script/text()')[0]
+        soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a).group(1)
+        # soup_c = soup_b.replace("u002F", '')
+        # print(soup_c)
+        huxiu_data = json.loads(soup_b, strict=False)
+        huxiu_ids = huxiu_data['news']['articleHot']
+        # print(huxiu_ids)
+        #
+        for huxiu_id in huxiu_ids:
+            huxiu_title = huxiu_id['title']
+            huxiu_url_ori = huxiu_id['share_url']
+            huxiu_url = huxiu_url_ori.replace("m.", "www.")
+            huxiu_zhishu_ori = huxiu_id['count_info']['viewnum']
+            huxiu_zhishu = str(round(huxiu_zhishu_ori/10000, 1)) + "万"
+            list_huxiu.append([huxiu_title, huxiu_url, huxiu_zhishu])
+        return packdata(list_huxiu)
 
 # Spider().spider_bsite()
