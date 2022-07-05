@@ -72,18 +72,19 @@ class Spider(object):
 
     # 知乎热榜
     def spider_zhihu(self):
-
+        ex = 'https://www.zhihu.com/question/'
         list_zhihu = []  # 此列表用于储存解析结果
         res = Spider(zhihu_api).res
         # 逐步解析接口返回的json
         zhihu_data = json.loads(res.text)['data']
         for part_zhihu_data in zhihu_data:  # 遍历每一个data对象
             zhihu_id = part_zhihu_data['target']['id']  # 从对象得到问题的id
+            zhihu_url = ex + str(zhihu_id)
             zhihu_title = part_zhihu_data['target']['title']  # 从对象得到问题的title
             zhihu_answer = part_zhihu_data['target']['answer_count']
             zhihu_follower = part_zhihu_data['target']['follower_count']
             zhihu_zhishu = str(zhihu_follower) + "/" + str(zhihu_answer)
-            list_zhihu.append([zhihu_title, zhihu_id, zhihu_zhishu])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
+            list_zhihu.append([zhihu_title, zhihu_url, zhihu_zhishu])  # 将id 和title组为一个列表，并添加在list_zhihu列表中
         return packdata(list_zhihu)
 
     # 头条热榜
