@@ -114,11 +114,12 @@ def task1():
     Timer(15 * 60, task1, ).start()
 
 
-# 此组每天采集一次
+# 此组每天采集一次，目前改为1小时
 def task2():
     # 多线程运行
     Thread(target=run_bsite, ).start()
-    Timer(24 * 60 * 60, task2, ).start()
+    Timer(1 * 60 * 60, task2, ).start()
+    # Timer(24 * 60 * 60, task2, ).start()
 
 
 task1()
