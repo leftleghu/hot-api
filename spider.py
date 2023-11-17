@@ -8,7 +8,9 @@ from lxml import etree
 from threading import Timer
 
 # vsite_api = "https://www.v2ex.com/?tab=hot"
-bsite_api = 'https://www.bilibili.com/v/popular/rank/all'
+# bsite_api = 'https://www.bilibili.com/v/popular/rank/all'
+
+bsite_api = 'https://api.bilibili.com/x/web-interface/ranking/v2?rid=0&type=all'
 weibo_api = "https://s.weibo.com/top/summary?cate=realtimehot"
 tieba_api = "http://tieba.baidu.com/hottopic/browse/topicList?res_type=1"
 zhihu_api = 'https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true'
@@ -30,7 +32,7 @@ headers_weibo = {
     'cookie': 'Apache=1704244029195.301.1654571795484; ULV=1654571795758:2:2:2:1704244029195.301.1654571795484:1654569076530; _s_tentry=-; SINAGLOBAL=7852623467206.027.1654569076435; SUB=_2AkMVwjdCf8NxqwJRmfoQyGLnb4VyyA_EieKjnsaZJRMxHRl-yT92qksctRB6PkIZrD8SLflsfRYDdXXHnXIxs3CqQHTG; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WWkJFLS199MowaNi.a5Mz8E'
 }
 headers_bsite = {
-    'host': 'www.bilibili.com',
+    # 'host': 'www.bilibili.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
 }
 headers_shijiulou = {
@@ -183,19 +185,17 @@ class Spider(object):
     # B站排行榜
     def spider_bsite(self):
         list_bsite = []
-        ex = 'https:'
-        soup = Spider(bsite_api).soup
-        # for i in soup.xpath("//div[@class='info']/a"):
-        #     bsite_title = i.xpath('text()')[0]
-        #     bsite_url = ex + i.get('href')
-        #     bsite_zhishu = i.xpath('normalize-space(//span[@class="data-box"]/text())')
-            # print(bsite_zhishu)
-        for i in soup.xpath("//div[@class='info']"):
-            bsite_title = i.xpath("./a/text()")[0]
-            bsite_url = ex + i.xpath("./a/@href")[0]
-            bsite_play = i.xpath('normalize-space(.//div[@class="detail-state"]/span[1]/text())')
-            bsite_like = i.xpath('normalize-space(.//div[@class="detail-state"]/span[2]/text())')
-            bsite_zhishu = bsite_play + "/" + bsite_like
+        # ex = 'https:'
+        # soup = Spider(bsite_api).soup
+        res = Spider(bsite_api).res
+        bsite_data = json.loads(res.text)['data']['list']
+        # print(res.text)
+        for i in bsite_data:
+            bsite_title = i['title']
+            bsite_url = i['short_link_v2']
+            bsite_play = i['stat']['view']
+            bsite_like = i['stat']['like']
+            bsite_zhishu = str(bsite_play) + "/" + str(bsite_like)
             list_bsite.append([bsite_title, bsite_url, bsite_zhishu])
         return packdata(list_bsite)
 
@@ -263,11 +263,12 @@ class Spider(object):
         list_kuaishou = []  # 此列表用于储存解析结果
         ex = 'https://www.kuaishou.com/search/video?searchKey='
         soup = Spider(kuaishou_api).soup
-        soup_a = soup.xpath('//script/text()')[0]
+        soup_a = soup.xpath('//script/text()')[1]
+        # print(soup_a)
         soup_b = re.search(r"window\.__APOLLO_STATE__=(.*?);", soup_a).group(1)
         kuaishou_data = json.loads(soup_b, strict=False)
         kuaishou_ids = kuaishou_data['defaultClient']['$ROOT_QUERY.visionHotRank({\"page\":\"brilliant\"})']['items']
-
+        # print(kuaishou_ids)
         for kuaishou_id in kuaishou_ids:
             kuaishou_key = kuaishou_id['id']
             kuaishou_title = kuaishou_data['defaultClient'][kuaishou_key]['name']

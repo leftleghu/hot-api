@@ -106,7 +106,7 @@ def task1():
     # Thread(target=run_vsite, ).start()
     Thread(target=run_shijiulou, ).start()
     Thread(target=run_cqmmgo, ).start()
-    Thread(target=run_tianya, ).start()
+    # Thread(target=run_tianya, ).start()
     Thread(target=run_douyin, ).start()
     Thread(target=run_kuaishou, ).start()
     Thread(target=run_a36kr, ).start()
