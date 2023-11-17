@@ -15,6 +15,8 @@ data_bsite = []  # B站
 data_weibo = []  # 微博
 data_shijiulou = []  # 19楼
 data_cqmmgo = []  # cqmmgo
+data_jiaxing = []  # 嘉兴19楼
+data_taizhou = []  # 台州19楼
 data_tianya = []  # 天涯
 data_douyin = []  # 抖音
 data_kuaishou = []  # 快手
@@ -69,6 +71,13 @@ def run_cqmmgo():
     global data_cqmmgo
     data_cqmmgo = s.spider_cqmmgo()
 
+def run_jiaxing():
+    global data_jiaxing
+    data_jiaxing = s.spider_jiaxing()
+
+def run_taizhou():
+    global data_taizhou
+    data_taizhou = s.spider_taizhou()
 
 def run_tianya():
     global data_tianya
@@ -106,6 +115,8 @@ def task1():
     # Thread(target=run_vsite, ).start()
     Thread(target=run_shijiulou, ).start()
     Thread(target=run_cqmmgo, ).start()
+    Thread(target=run_jiaxing, ).start()
+    Thread(target=run_taizhou, ).start()
     # Thread(target=run_tianya, ).start()
     Thread(target=run_douyin, ).start()
     Thread(target=run_kuaishou, ).start()
@@ -153,6 +164,10 @@ def read_name(name: str):
         return data_shijiulou
     elif name == 'cqmmgo':
         return data_cqmmgo
+    elif name == 'jiaxing':
+        return data_jiaxing
+    elif name == 'taizhou':
+        return data_taizhou
     elif name == 'tianya':
         return data_tianya
     elif name == 'douyin':

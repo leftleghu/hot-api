@@ -17,6 +17,8 @@ zhihu_api = 'https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50
 baidu_api = 'https://top.baidu.com/board?tab=realtime'
 shijiulou_api = 'https://www.19lou.com/r/1/rd.html'
 cqmmgo_api = 'https://go.cqmmgo.com/r/82/syttsl.html'
+jiaxing_api = 'https://jiaxing.19lou.com/r/58/jrrd.html'
+taizhou_api = 'https://taizhou.19lou.com/r/37/rd.html'
 toutiao_api = 'https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc'
 tianya_api = 'https://bbs.tianya.cn/api?method=bbs.ice.getHotArticleList&params.pageSize=40&params.pageNum=1'
 douyin_api = 'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/'
@@ -65,6 +67,12 @@ class Spider(object):
                 self.res = requests.get(url, headers=headers_shijiulou)
                 self.res.encoding = "gbk"
             elif url == cqmmgo_api:
+                self.res = requests.get(url, headers=headers_shijiulou)
+                self.res.encoding = "gbk"
+            elif url == jiaxing_api:
+                self.res = requests.get(url, headers=headers_shijiulou)
+                self.res.encoding = "gbk"
+            elif url == taizhou_api:
                 self.res = requests.get(url, headers=headers_shijiulou)
                 self.res.encoding = "gbk"
             else:
@@ -228,6 +236,36 @@ class Spider(object):
             # print(shijiulou_zhishu)
             list_cqmmgo.append([cqmmgo_title, cqmmgo_url, cqmmgo_zhishu])
         return packdata(list_cqmmgo)
+
+    # 嘉兴19楼排行榜
+    def spider_jiaxing(self):
+        list_jiaxing = []
+        ex = 'https:'
+        soup = Spider(jiaxing_api).soup
+        for i in soup.xpath("//div[starts-with(@id,'J_item_')]"):
+            jiaxing_title = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@title)')
+            jiaxing_url = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@href)')
+            jiaxing_read = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[1]/em/text())')
+            jiaxing_reply = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[2]/em/text())')
+            jiaxing_zhishu = jiaxing_read + "/" + jiaxing_reply
+            # print(shijiulou_zhishu)
+            list_jiaxing.append([jiaxing_title, jiaxing_url, jiaxing_zhishu])
+        return packdata(list_jiaxing)
+
+    # 台州19楼排行榜
+    def spider_taizhou(self):
+        list_taizhou = []
+        ex = 'https:'
+        soup = Spider(taizhou_api).soup
+        for i in soup.xpath("//div[starts-with(@id,'J_item_')]"):
+            taizhou_title = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@title)')
+            taizhou_url = i.xpath('normalize-space(.//div[@class="item-bd"]/div/a/@href)')
+            taizhou_read = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[1]/em/text())')
+            taizhou_reply = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[2]/em/text())')
+            taizhou_zhishu = taizhou_read + "/" + taizhou_reply
+            # print(shijiulou_zhishu)
+            list_taizhou.append([taizhou_title, taizhou_url, taizhou_zhishu])
+        return packdata(list_taizhou)
 
     # 天涯热搜
     def spider_tianya(self):
