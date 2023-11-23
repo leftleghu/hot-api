@@ -17,11 +17,12 @@ data_shijiulou = []  # 19楼
 data_cqmmgo = []  # cqmmgo
 data_jiaxing = []  # 嘉兴19楼
 data_taizhou = []  # 台州19楼
-data_tianya = []  # 天涯
+data_douban = []  # 豆瓣
 data_douyin = []  # 抖音
 data_kuaishou = []  # 快手
 data_a36kr = []  # 36kr
 data_huxiu = []  # huxiu
+data_hupu = []  # 虎扑
 
 
 s = Spider()
@@ -79,9 +80,9 @@ def run_taizhou():
     global data_taizhou
     data_taizhou = s.spider_taizhou()
 
-def run_tianya():
-    global data_tianya
-    data_tianya = s.spider_tianya()
+def run_douban():
+    global data_douban
+    data_douban = s.spider_douban()
 
 
 def run_douyin():
@@ -103,6 +104,10 @@ def run_huxiu():
     global data_huxiu
     data_huxiu = s.spider_huxiu()
 
+def run_hupu():
+    global data_hupu
+    data_hupu = s.spider_hupu()
+
 
 # 此组15分钟采集一次
 def task1():
@@ -117,7 +122,7 @@ def task1():
     Thread(target=run_cqmmgo, ).start()
     Thread(target=run_jiaxing, ).start()
     Thread(target=run_taizhou, ).start()
-    # Thread(target=run_tianya, ).start()
+    Thread(target=run_douban, ).start()
     Thread(target=run_douyin, ).start()
     Thread(target=run_kuaishou, ).start()
     Thread(target=run_a36kr, ).start()
@@ -129,6 +134,7 @@ def task1():
 def task2():
     # 多线程运行
     Thread(target=run_bsite, ).start()
+    Thread(target=run_hupu, ).start()
     Timer(1 * 60 * 60, task2, ).start()
     # Timer(24 * 60 * 60, task2, ).start()
 
@@ -168,8 +174,8 @@ def read_name(name: str):
         return data_jiaxing
     elif name == 'taizhou':
         return data_taizhou
-    elif name == 'tianya':
-        return data_tianya
+    elif name == 'douban':
+        return data_douban
     elif name == 'douyin':
         return data_douyin
     elif name == 'kuaishou':
@@ -178,6 +184,8 @@ def read_name(name: str):
         return data_a36kr
     elif name == 'huxiu':
         return data_huxiu
+    elif name == 'hupu':
+        return data_hupu
 
 
 if __name__ == '__main__':

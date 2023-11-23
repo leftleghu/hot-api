@@ -20,10 +20,11 @@ cqmmgo_api = 'https://go.cqmmgo.com/r/82/syttsl.html'
 jiaxing_api = 'https://jiaxing.19lou.com/r/58/jrrd.html'
 taizhou_api = 'https://taizhou.19lou.com/r/37/rd.html'
 toutiao_api = 'https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc'
-tianya_api = 'https://bbs.tianya.cn/api?method=bbs.ice.getHotArticleList&params.pageSize=40&params.pageNum=1'
+douban_api = 'https://www.douban.com/gallery/'
 douyin_api = 'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/'
 kuaishou_api = 'https://www.kuaishou.com/brilliant'
 huxiu_api = 'https://www.huxiu.com/'
+hupu_api = 'https://bbs.hupu.com/topic-daily-hot'
 
 
 headers = {
@@ -201,8 +202,10 @@ class Spider(object):
         for i in bsite_data:
             bsite_title = i['title']
             bsite_url = i['short_link_v2']
-            bsite_play = i['stat']['view']
-            bsite_like = i['stat']['like']
+            bsite_play_ori = i['stat']['view']
+            bsite_play = str(round(bsite_play_ori/10000, 1)) + "万"
+            bsite_like_ori = i['stat']['like']
+            bsite_like = str(round(bsite_like_ori/10000, 1)) + "万"
             bsite_zhishu = str(bsite_play) + "/" + str(bsite_like)
             list_bsite.append([bsite_title, bsite_url, bsite_zhishu])
         return packdata(list_bsite)
@@ -263,23 +266,38 @@ class Spider(object):
             taizhou_read = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[1]/em/text())')
             taizhou_reply = i.xpath('normalize-space(.//div[@class="item-ft"]/p/span[2]/em/text())')
             taizhou_zhishu = taizhou_read + "/" + taizhou_reply
-            # print(shijiulou_zhishu)
+            # print(taizhou_zhishu)
             list_taizhou.append([taizhou_title, taizhou_url, taizhou_zhishu])
         return packdata(list_taizhou)
 
-    # 天涯热搜
-    def spider_tianya(self):
-        list_tianya = []  # 此列表用于储存解析结果
-        res = Spider(tianya_api).res
-        # 逐步解析接口返回的json
-        tianya_data = json.loads(res.text)['data']['rows']
-        # print(tianya_data)
-        for part_tianya_data in tianya_data:  # 遍历每一个data对象
-            tianya_title = part_tianya_data['title']  # 从对象得到问题的title
-            tianya_url = part_tianya_data['url']  # 从对象得到问题的url
-            tianya_zhishu = part_tianya_data['count']  # 从对象得到问题的回复数
-            list_tianya.append([tianya_title, tianya_url, tianya_zhishu])  # 将title和url组为一个列表，并添加在list_tianya列表中
-        return packdata(list_tianya)
+    # 豆瓣热搜
+    def spider_douban(self):
+        list_douban = []
+        soup = Spider(douban_api).soup
+        for soup_a in soup.xpath("//ul[@class='trend']/li"):
+            douban_title = soup_a.xpath(".//a/text()")[0]
+            # print(douban_title)
+            douban_url = soup_a.xpath(".//a/@href")[0]
+            # print(douban_url)
+            douban_zhishu_ori = soup_a.xpath(".//span/text()")[0]
+            chinese_chars = ''.join([chr(i) for i in range(0x4e00, 0x9fff)])
+            douban_zhishu_ori_num = douban_zhishu_ori.translate(str.maketrans('', '', chinese_chars))
+            douban_zhishu = str(douban_zhishu_ori_num) + "万"
+            # print(douban_zhishu_ori_num)
+            list_douban.append([douban_title, douban_url, douban_zhishu])
+        return packdata(list_douban)
+
+        # list_tianya = []  # 此列表用于储存解析结果
+        # res = Spider(tianya_api).res
+        # # 逐步解析接口返回的json
+        # tianya_data = json.loads(res.text)['data']['rows']
+        # # print(tianya_data)
+        # for part_tianya_data in tianya_data:  # 遍历每一个data对象
+        #     tianya_title = part_tianya_data['title']  # 从对象得到问题的title
+        #     tianya_url = part_tianya_data['url']  # 从对象得到问题的url
+        #     tianya_zhishu = part_tianya_data['count']  # 从对象得到问题的回复数
+        #     list_tianya.append([tianya_title, tianya_url, tianya_zhishu])  # 将title和url组为一个列表，并添加在list_tianya列表中
+        # return packdata(list_tianya)
 
     # 抖音热榜
     def spider_douyin(self):
@@ -357,5 +375,20 @@ class Spider(object):
             huxiu_zhishu = str(round(huxiu_zhishu_ori/10000, 1)) + "万"
             list_huxiu.append([huxiu_title, huxiu_url, huxiu_zhishu])
         return packdata(list_huxiu)
+
+    # 虎扑步行街主干道热度榜单
+    def spider_hupu(self):
+        list_hupu = []
+        ex = 'https://bbs.hupu.com'
+        soup = Spider(hupu_api).soup
+        for soup_a in soup.xpath("//div[@class='bbs-sl-web-post-layout']"):
+            hupu_title = soup_a.xpath(".//a[@class='p-title']/text()")[0]
+            # print(hupu_title)
+            hupu_url_ori = soup_a.xpath(".//a[@class='p-title']/@href")[0]
+            hupu_url = ex + hupu_url_ori
+            hupu_zhishu = soup_a.xpath(".//div[@class='post-datum']/text()")[0]
+            # print(hupu_zhishu)
+            list_hupu.append([hupu_title, hupu_url, hupu_zhishu])
+        return packdata(list_hupu)
 
 # Spider().spider_bsite()
