@@ -32,7 +32,7 @@ headers = {
 headers_weibo = {
     'host': 's.weibo.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-    'cookie': 'Apache=1704244029195.301.1654571795484; ULV=1654571795758:2:2:2:1704244029195.301.1654571795484:1654569076530; _s_tentry=-; SINAGLOBAL=7852623467206.027.1654569076435; SUB=_2AkMVwjdCf8NxqwJRmfoQyGLnb4VyyA_EieKjnsaZJRMxHRl-yT92qksctRB6PkIZrD8SLflsfRYDdXXHnXIxs3CqQHTG; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WWkJFLS199MowaNi.a5Mz8E'
+    'cookie': 'xxxxxxxx'
 }
 headers_bsite = {
     # 'host': 'www.bilibili.com',
@@ -40,7 +40,7 @@ headers_bsite = {
 }
 headers_shijiulou = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-    'cookie': '_DM_SID_=9322454c193c65daf5cdc3a8ac527dd6; _9755xjdesxxd_=32; __snaker__id=dCoLZRoVn7FF19zA; _Z3nY0d4C_=37XgPK9h'
+    'cookie': 'xxxxxxxx'
 }
 
 
