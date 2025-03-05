@@ -359,9 +359,10 @@ class Spider(object):
         list_huxiu = []  # 此列表用于储存解析结果
         ex = 'https://36kr.com/p/'
         soup = Spider(huxiu_api).soup
+        print(soup)
         soup_a = soup.xpath('//script/text()')[0]
-        print(soup_a)
-        soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a).group(0)
+        # print(soup_a)
+        soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a).group(1)
         # soup_c = soup_b.replace("u002F", '')
         # print(soup_c)
         huxiu_data = json.loads(soup_b, strict=False)
