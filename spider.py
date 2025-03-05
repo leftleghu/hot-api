@@ -360,8 +360,7 @@ class Spider(object):
         ex = 'https://36kr.com/p/'
         soup = Spider(huxiu_api).soup
         soup_a = soup.xpath('//script/text()')[0]
-        soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a)
-        # soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a).group(1)
+        soup_b = re.search(r"window\.__INITIAL_STATE__=(.*?);", soup_a).group(0)
         # soup_c = soup_b.replace("u002F", '')
         # print(soup_c)
         huxiu_data = json.loads(soup_b, strict=False)
