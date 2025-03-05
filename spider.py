@@ -70,6 +70,9 @@ class Spider(object):
             elif url == shijiulou_api:
                 self.res = requests.get(url, headers=headers_shijiulou)
                 self.res.encoding = "gbk"
+            elif url == huxiu_api:
+                self.res = requests.get(url, headers=headers_huxiu)
+                self.res.encoding = "gbk"
             elif url == cqmmgo_api:
                 self.res = requests.get(url, headers=headers_shijiulou)
                 self.res.encoding = "gbk"
