@@ -364,15 +364,17 @@ class Spider(object):
         # soup_c = soup_b.replace("u002F", '')
         # print(soup_c)
         huxiu_data = json.loads(soup_b, strict=False)
-        huxiu_ids = huxiu_data['news']['articleHot']
+        huxiu_ids = huxiu_data['news']['hotArticles']
         # print(huxiu_ids)
         #
         for huxiu_id in huxiu_ids:
             huxiu_title = huxiu_id['title']
-            huxiu_url_ori = huxiu_id['share_url']
-            huxiu_url = huxiu_url_ori.replace("m.", "www.")
-            huxiu_zhishu_ori = huxiu_id['count_info']['viewnum']
-            huxiu_zhishu = str(round(huxiu_zhishu_ori/10000, 1)) + "万"
+            huxiu_url = huxiu_id['url']
+            huxiu_zhishu = huxiu_id['count_info']['favorite_num']
+            # huxiu_url_ori = huxiu_id['share_url']
+            # huxiu_url = huxiu_url_ori.replace("m.", "www.")
+            # huxiu_zhishu_ori = huxiu_id['count_info']['favorite_num']
+            # huxiu_zhishu = str(round(huxiu_zhishu_ori/10000, 1)) + "万"
             list_huxiu.append([huxiu_title, huxiu_url, huxiu_zhishu])
         return packdata(list_huxiu)
 
